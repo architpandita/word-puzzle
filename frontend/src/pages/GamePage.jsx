@@ -32,6 +32,7 @@ export const GamePage = () => {
   const [shake, setShake] = useState(false);
   const [sentences, setSentences] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [activePosition, setActivePosition] = useState(null); // Track active letter position
 
   // Initialize game - load sentences and check for saved state
   useEffect(() => {
@@ -94,8 +95,24 @@ export const GamePage = () => {
       setUserAnswer(initialAnswer);
       setUsedLetters([]);
       setHintUsed(false);
+      
+      // Set first unrevealed position as active
+      findAndSetNextActivePosition(initialAnswer);
     }
   }, [currentLevel, currentSentence]);
+
+  // Find next unrevealed position and set it as active
+  const findAndSetNextActivePosition = (answer) => {
+    for (let wordIdx = 0; wordIdx < answer.length; wordIdx++) {
+      for (let letterIdx = 0; letterIdx < answer[wordIdx].length; letterIdx++) {
+        if (!answer[wordIdx][letterIdx].revealed) {
+          setActivePosition({ wordIdx, letterIdx });
+          return;
+        }
+      }
+    }
+    setActivePosition(null); // All revealed
+  };
 
   // Save game state whenever it changes
   useEffect(() => {
@@ -128,9 +145,12 @@ export const GamePage = () => {
       setUserAnswer(updatedAnswer);
       setUsedLetters([...usedLetters, letter]);
       
+      // Update active position
+      findAndSetNextActivePosition(updatedAnswer);
+      
       toast.success('Correct!', {
         description: `${letter} is in the sentence`,
-        duration: 2000,
+        duration: 1500,
       });
 
       // Check if puzzle is complete
@@ -141,6 +161,7 @@ export const GamePage = () => {
       if (isComplete) {
         // Mark sentence as completed ONLY on success
         addCompletedSentence(currentSentence.sentence);
+        setActivePosition(null);
         
         setTimeout(() => {
           setShowLevelComplete(true);
@@ -157,7 +178,7 @@ export const GamePage = () => {
       
       toast.error('Wrong!', {
         description: `${letter} is not in the sentence. Lives left: ${newLives}`,
-        duration: 2000,
+        duration: 1500,
       });
 
       if (newLives === 0) {
@@ -191,6 +212,7 @@ export const GamePage = () => {
     if (hintGiven) {
       setUserAnswer(updatedAnswer);
       setHintUsed(true);
+      findAndSetNextActivePosition(updatedAnswer);
       toast.info('Hint Used!', {
         description: 'A letter has been revealed',
         duration: 2000,
@@ -237,6 +259,7 @@ export const GamePage = () => {
     setUserAnswer(initialAnswer);
     setUsedLetters([]);
     setHintUsed(false);
+    findAndSetNextActivePosition(initialAnswer);
   };
 
   const handleHome = () => {
@@ -256,81 +279,91 @@ export const GamePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/30 overflow-hidden">
       {/* Theme Toggle - Top Right */}
-      <div className="fixed top-4 right-4 z-50 animate-fade-in">
+      <div className="fixed top-2 right-2 z-50">
         <ThemeToggle />
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-float" />
-      <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1.5s' }} />
-
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8 animate-fade-in">
+      {/* Compact Header */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-border/50">
+        <div className="flex items-center justify-between">
           <Button
-            variant="outline"
-            size="lg"
+            variant="ghost"
+            size="sm"
             onClick={handleHome}
-            className="gap-2 rounded-full"
+            className="gap-2"
           >
-            <Home className="w-5 h-5" />
-            Home
+            <Home className="w-4 h-4" />
+            <span className="hidden sm:inline">Home</span>
           </Button>
           
-          <div className="text-center">
-            <h2 className="font-game text-2xl sm:text-3xl font-bold capitalize text-foreground">
-              {categories.length > 1 ? 'Mixed Categories' : category}
+          <div className="text-center flex-1 mx-4">
+            <h2 className="font-game text-lg sm:text-xl font-bold capitalize text-foreground">
+              {categories.length > 1 ? 'Mixed' : category}
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Level {currentLevel + 1} of {sentences.length}
+            <p className="text-xs text-muted-foreground">
+              Level {currentLevel + 1}/{sentences.length}
             </p>
           </div>
 
           <LivesDisplay lives={lives} shake={shake} />
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-8 animate-fade-in">
+        {/* Compact Progress Bar */}
+        <div className="mt-2">
           <Progress 
             value={(currentLevel / sentences.length) * 100} 
-            className="h-3"
+            className="h-1.5"
           />
         </div>
+      </div>
 
-        {/* Category Badge */}
-        <div className="flex justify-center mb-6 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 border-2 border-secondary/40">
-            <span className="text-sm font-medium text-secondary-foreground">
-              {currentSentence.category}
-            </span>
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {/* Category Badge */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/20 border border-secondary/40">
+              <span className="text-xs font-medium text-secondary-foreground">
+                {currentSentence.category}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Game Board */}
-        <Card className="mb-8 shadow-xl border-2 animate-fade-in">
-          <div className="p-6 sm:p-8">
-            <GameBoard userAnswer={userAnswer} shake={shake} />
+          {/* Game Board */}
+          <Card className="shadow-lg border-2">
+            <div className="p-4 sm:p-6">
+              <GameBoard 
+                userAnswer={userAnswer} 
+                shake={shake}
+                activePosition={activePosition}
+              />
+            </div>
+          </Card>
+
+          {/* Hint Button */}
+          <div className="flex justify-center pb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleHint}
+              disabled={hintUsed}
+              className="gap-2 rounded-full bg-info/10 border-info/30 hover:bg-info/20 disabled:opacity-50"
+            >
+              <Lightbulb className="w-4 h-4" />
+              <span className="text-sm">{hintUsed ? 'Hint Used' : 'Get Hint'}</span>
+            </Button>
           </div>
-        </Card>
 
-        {/* Hint Button */}
-        <div className="flex justify-center mb-6 animate-fade-in">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={handleHint}
-            disabled={hintUsed}
-            className="gap-2 rounded-full bg-info/10 border-info/30 hover:bg-info/20 disabled:opacity-50"
-          >
-            <Lightbulb className="w-5 h-5" />
-            {hintUsed ? 'Hint Used' : 'Get Hint'}
-          </Button>
+          {/* Extra spacing for scrolling comfort */}
+          <div className="h-8" />
         </div>
+      </div>
 
-        {/* Letter Keyboard */}
-        <div className="animate-fade-in">
+      {/* Fixed Letter Keyboard at Bottom */}
+      <div className="flex-shrink-0 bg-background/95 backdrop-blur-sm border-t-2 border-border/50 shadow-lg">
+        <div className="px-2 py-3">
           <LetterKeyboard 
             onLetterClick={handleLetterClick}
             usedLetters={usedLetters}

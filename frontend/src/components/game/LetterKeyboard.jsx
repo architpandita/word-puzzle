@@ -10,9 +10,9 @@ export const LetterKeyboard = ({ onLetterClick, usedLetters }) => {
   ];
 
   return (
-    <div className="space-y-3 max-w-4xl mx-auto">
+    <div className="space-y-2 max-w-4xl mx-auto">
       {rows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-2 flex-wrap">
+        <div key={rowIndex} className="flex justify-center gap-1 sm:gap-1.5 flex-wrap">
           {row.map((letter) => {
             const isUsed = usedLetters.includes(letter);
             
@@ -21,10 +21,10 @@ export const LetterKeyboard = ({ onLetterClick, usedLetters }) => {
                 key={letter}
                 onClick={() => onLetterClick(letter)}
                 disabled={isUsed}
-                className={`font-game text-lg sm:text-xl w-10 h-10 sm:w-12 sm:h-12 rounded-xl transition-all duration-200 ${
+                className={`font-game text-base sm:text-lg w-8 h-8 sm:w-10 sm:h-10 p-0 rounded-lg transition-all duration-200 ${
                   isUsed
                     ? 'opacity-30 cursor-not-allowed bg-muted hover:bg-muted'
-                    : 'bg-card hover:bg-primary hover:text-white hover:scale-110 hover:shadow-lg border-2 border-border hover:border-primary'
+                    : 'bg-card hover:bg-primary hover:text-white hover:scale-110 hover:shadow-md border-2 border-border hover:border-primary active:scale-95'
                 }`}
                 variant="outline"
               >
