@@ -1,104 +1,108 @@
 export const gameData = {
   proverbs: [
-    {
-      sentence: "A BIRD IN THE HAND IS WORTH TWO IN THE BUSH",
-      category: "Classic Proverb"
-    },
-    {
-      sentence: "ACTIONS SPEAK LOUDER THAN WORDS",
-      category: "Wisdom"
-    },
-    {
-      sentence: "THE EARLY BIRD CATCHES THE WORM",
-      category: "Classic Proverb"
-    },
-    {
-      sentence: "ALL THAT GLITTERS IS NOT GOLD",
-      category: "Wisdom"
-    },
-    {
-      sentence: "WHEN IN ROME DO AS THE ROMANS DO",
-      category: "Classic Proverb"
-    },
-    {
-      sentence: "A PENNY SAVED IS A PENNY EARNED",
-      category: "Wisdom"
-    },
-    {
-      sentence: "DONT COUNT YOUR CHICKENS BEFORE THEY HATCH",
-      category: "Classic Proverb"
-    },
-    {
-      sentence: "THE GRASS IS ALWAYS GREENER ON THE OTHER SIDE",
-      category: "Wisdom"
-    }
+    { sentence: "A BIRD IN THE HAND IS WORTH TWO IN THE BUSH", category: "Classic Proverb" },
+    { sentence: "ACTIONS SPEAK LOUDER THAN WORDS", category: "Wisdom" },
+    { sentence: "THE EARLY BIRD CATCHES THE WORM", category: "Classic Proverb" },
+    { sentence: "ALL THAT GLITTERS IS NOT GOLD", category: "Wisdom" },
+    { sentence: "WHEN IN ROME DO AS THE ROMANS DO", category: "Classic Proverb" },
+    { sentence: "A PENNY SAVED IS A PENNY EARNED", category: "Wisdom" },
+    { sentence: "DONT COUNT YOUR CHICKENS BEFORE THEY HATCH", category: "Classic Proverb" },
+    { sentence: "THE GRASS IS ALWAYS GREENER ON THE OTHER SIDE", category: "Wisdom" },
+    { sentence: "BETTER LATE THAN NEVER", category: "Classic Proverb" },
+    { sentence: "YOU CANT JUDGE A BOOK BY ITS COVER", category: "Wisdom" },
+    { sentence: "WHERE THERES SMOKE THERES FIRE", category: "Classic Proverb" },
+    { sentence: "PRACTICE MAKES PERFECT", category: "Wisdom" },
+    { sentence: "EVERY CLOUD HAS A SILVER LINING", category: "Classic Proverb" },
+    { sentence: "Rome WASNT BUILT IN A DAY", category: "Wisdom" },
+    { sentence: "TOO MANY COOKS SPOIL THE BROTH", category: "Classic Proverb" },
+    { sentence: "THE SQUEAKY WHEEL GETS THE GREASE", category: "Wisdom" },
+    { sentence: "DONT PUT ALL YOUR EGGS IN ONE BASKET", category: "Classic Proverb" },
+    { sentence: "HONESTY IS THE BEST POLICY", category: "Wisdom" },
+    { sentence: "TIME HEALS ALL WOUNDS", category: "Classic Proverb" },
+    { sentence: "A STITCH IN TIME SAVES NINE", category: "Wisdom" },
+    { sentence: "LOOK BEFORE YOU LEAP", category: "Classic Proverb" },
+    { sentence: "BIRDS OF A FEATHER FLOCK TOGETHER", category: "Wisdom" },
+    { sentence: "THE APPLE DOESNT FALL FAR FROM THE TREE", category: "Classic Proverb" },
+    { sentence: "ABSENCE MAKES THE HEART GROW FONDER", category: "Wisdom" },
+    { sentence: "YOU REAP WHAT YOU SOW", category: "Classic Proverb" },
+    { sentence: "BEAUTY IS IN THE EYE OF THE BEHOLDER", category: "Wisdom" },
+    { sentence: "BEGGARS CANT BE CHOOSERS", category: "Classic Proverb" },
+    { sentence: "BETTER SAFE THAN SORRY", category: "Wisdom" },
+    { sentence: "CURIOSITY KILLED THE CAT", category: "Classic Proverb" },
+    { sentence: "DONT CRY OVER SPILLED MILK", category: "Wisdom" },
+    { sentence: "FORTUNE FAVORS THE BOLD", category: "Classic Proverb" },
+    { sentence: "GOOD THINGS COME TO THOSE WHO WAIT", category: "Wisdom" },
+    { sentence: "HASTE MAKES WASTE", category: "Classic Proverb" },
+    { sentence: "IF THE SHOE FITS WEAR IT", category: "Wisdom" }
   ],
   movies: [
-    {
-      sentence: "MAY THE FORCE BE WITH YOU",
-      category: "Star Wars"
-    },
-    {
-      sentence: "ILL BE BACK",
-      category: "The Terminator"
-    },
-    {
-      sentence: "LIFE IS LIKE A BOX OF CHOCOLATES",
-      category: "Forrest Gump"
-    },
-    {
-      sentence: "YOU CANT HANDLE THE TRUTH",
-      category: "A Few Good Men"
-    },
-    {
-      sentence: "TO INFINITY AND BEYOND",
-      category: "Toy Story"
-    },
-    {
-      sentence: "JUST KEEP SWIMMING",
-      category: "Finding Nemo"
-    },
-    {
-      sentence: "WITH GREAT POWER COMES GREAT RESPONSIBILITY",
-      category: "Spider-Man"
-    },
-    {
-      sentence: "HASTA LA VISTA BABY",
-      category: "Terminator 2"
-    }
+    { sentence: "MAY THE FORCE BE WITH YOU", category: "Star Wars" },
+    { sentence: "ILL BE BACK", category: "The Terminator" },
+    { sentence: "LIFE IS LIKE A BOX OF CHOCOLATES", category: "Forrest Gump" },
+    { sentence: "YOU CANT HANDLE THE TRUTH", category: "A Few Good Men" },
+    { sentence: "TO INFINITY AND BEYOND", category: "Toy Story" },
+    { sentence: "JUST KEEP SWIMMING", category: "Finding Nemo" },
+    { sentence: "WITH GREAT POWER COMES GREAT RESPONSIBILITY", category: "Spider-Man" },
+    { sentence: "HASTA LA VISTA BABY", category: "Terminator 2" },
+    { sentence: "YOU TALKING TO ME", category: "Taxi Driver" },
+    { sentence: "HERES LOOKING AT YOU KID", category: "Casablanca" },
+    { sentence: "I SEE DEAD PEOPLE", category: "The Sixth Sense" },
+    { sentence: "FRANKLY MY DEAR I DONT GIVE A DAMN", category: "Gone with the Wind" },
+    { sentence: "THERE IS NO PLACE LIKE HOME", category: "The Wizard of Oz" },
+    { sentence: "IM GOING TO MAKE HIM AN OFFER HE CANT REFUSE", category: "The Godfather" },
+    { sentence: "YOU HAD ME AT HELLO", category: "Jerry Maguire" },
+    { sentence: "IM KING OF THE WORLD", category: "Titanic" },
+    { sentence: "SHOW ME THE MONEY", category: "Jerry Maguire" },
+    { sentence: "WHY SO SERIOUS", category: "The Dark Knight" },
+    { sentence: "AFTER ALL TOMORROW IS ANOTHER DAY", category: "Gone with the Wind" },
+    { sentence: "KEEP YOUR FRIENDS CLOSE BUT YOUR ENEMIES CLOSER", category: "The Godfather II" },
+    { sentence: "MY PRECIOUS", category: "Lord of the Rings" },
+    { sentence: "NOBODY PUTS BABY IN A CORNER", category: "Dirty Dancing" },
+    { sentence: "YOU IS KIND YOU IS SMART YOU IS IMPORTANT", category: "The Help" },
+    { sentence: "CARPE DIEM SEIZE THE DAY BOYS", category: "Dead Poets Society" },
+    { sentence: "JUST WHEN I THOUGHT I WAS OUT THEY PULL ME BACK IN", category: "The Godfather III" },
+    { sentence: "I AM GROOT", category: "Guardians of the Galaxy" },
+    { sentence: "WAKANDA FOREVER", category: "Black Panther" },
+    { sentence: "I AM INEVITABLE", category: "Avengers Endgame" },
+    { sentence: "AVENGERS ASSEMBLE", category: "Avengers Endgame" },
+    { sentence: "WITH GREAT POWER MUST ALSO COME GREAT RESPONSIBILITY", category: "Spider-Man" },
+    { sentence: "I VOLUNTEER AS TRIBUTE", category: "The Hunger Games" },
+    { sentence: "MAY THE ODDS BE EVER IN YOUR FAVOR", category: "The Hunger Games" },
+    { sentence: "WINTER IS COMING", category: "Game of Thrones" }
   ],
   motivation: [
-    {
-      sentence: "BELIEVE YOU CAN AND YOURE HALFWAY THERE",
-      category: "Inspiration"
-    },
-    {
-      sentence: "THE ONLY WAY TO DO GREAT WORK IS TO LOVE WHAT YOU DO",
-      category: "Steve Jobs"
-    },
-    {
-      sentence: "SUCCESS IS NOT FINAL FAILURE IS NOT FATAL",
-      category: "Winston Churchill"
-    },
-    {
-      sentence: "DREAM BIG WORK HARD STAY FOCUSED",
-      category: "Motivation"
-    },
-    {
-      sentence: "YOUR LIMITATION IS ONLY YOUR IMAGINATION",
-      category: "Inspiration"
-    },
-    {
-      sentence: "GREAT THINGS NEVER COME FROM COMFORT ZONES",
-      category: "Motivation"
-    },
-    {
-      sentence: "BE THE CHANGE YOU WISH TO SEE IN THE WORLD",
-      category: "Gandhi"
-    },
-    {
-      sentence: "EVERY ACCOMPLISHMENT STARTS WITH THE DECISION TO TRY",
-      category: "Inspiration"
-    }
-  ]
+    { sentence: "BELIEVE YOU CAN AND YOURE HALFWAY THERE", category: "Inspiration" },
+    { sentence: "THE ONLY WAY TO DO GREAT WORK IS TO LOVE WHAT YOU DO", category: "Steve Jobs" },
+    { sentence: "SUCCESS IS NOT FINAL FAILURE IS NOT FATAL", category: "Winston Churchill" },
+    { sentence: "DREAM BIG WORK HARD STAY FOCUSED", category: "Motivation" },
+    { sentence: "YOUR LIMITATION IS ONLY YOUR IMAGINATION", category: "Inspiration" },
+    { sentence: "GREAT THINGS NEVER COME FROM COMFORT ZONES", category: "Motivation" },
+    { sentence: "BE THE CHANGE YOU WISH TO SEE IN THE WORLD", category: "Gandhi" },
+    { sentence: "EVERY ACCOMPLISHMENT STARTS WITH THE DECISION TO TRY", category: "Inspiration" },
+    { sentence: "DONT WATCH THE CLOCK DO WHAT IT DOES KEEP GOING", category: "Sam Levenson" },
+    { sentence: "THE FUTURE BELONGS TO THOSE WHO BELIEVE IN THE BEAUTY OF THEIR DREAMS", category: "Eleanor Roosevelt" },
+    { sentence: "IT DOES NOT MATTER HOW SLOWLY YOU GO AS LONG AS YOU DO NOT STOP", category: "Confucius" },
+    { sentence: "EVERYTHING YOUVE EVER WANTED IS ON THE OTHER SIDE OF FEAR", category: "George Addair" },
+    { sentence: "SUCCESS IS NOT HOW HIGH YOU HAVE CLIMBED BUT HOW YOU MAKE A POSITIVE DIFFERENCE", category: "Roy T Bennett" },
+    { sentence: "BELIEVE IN YOURSELF TAKE ON YOUR CHALLENGES DIG DEEP WITHIN YOURSELF", category: "Motivation" },
+    { sentence: "THE ONLY IMPOSSIBLE JOURNEY IS THE ONE YOU NEVER BEGIN", category: "Tony Robbins" },
+    { sentence: "IN THE MIDDLE OF EVERY DIFFICULTY LIES OPPORTUNITY", category: "Albert Einstein" },
+    { sentence: "DONT LET YESTERDAY TAKE UP TOO MUCH OF TODAY", category: "Will Rogers" },
+    { sentence: "YOU LEARN MORE FROM FAILURE THAN FROM SUCCESS", category: "Inspiration" },
+    { sentence: "ITS NOT WHETHER YOU GET KNOCKED DOWN ITS WHETHER YOU GET UP", category: "Vince Lombardi" },
+    { sentence: "IF YOU ARE WORKING ON SOMETHING THAT YOU REALLY CARE ABOUT YOU DONT HAVE TO BE PUSHED", category: "Steve Jobs" },
+    { sentence: "PEOPLE WHO ARE CRAZY ENOUGH TO THINK THEY CAN CHANGE THE WORLD ARE THE ONES WHO DO", category: "Rob Siltanen" },
+    { sentence: "FAILURE WILL NEVER OVERTAKE ME IF MY DETERMINATION TO SUCCEED IS STRONG ENOUGH", category: "Og Mandino" },
+    { sentence: "ENTREPRENEURS ARE GREAT AT DEALING WITH UNCERTAINTY AND ALSO VERY GOOD AT MINIMIZING RISK", category: "Mohnish Pabrai" },
+    { sentence: "WE MAY ENCOUNTER MANY DEFEATS BUT WE MUST NOT BE DEFEATED", category: "Maya Angelou" },
+    { sentence: "KNOWING IS NOT ENOUGH WE MUST APPLY WISHING IS NOT ENOUGH WE MUST DO", category: "Johann Wolfgang Von Goethe" },
+    { sentence: "IMAGINE YOUR LIFE IS PERFECT IN EVERY RESPECT WHAT WOULD IT LOOK LIKE", category: "Brian Tracy" },
+    { sentence: "WE GENERATE FEARS WHILE WE SIT WE OVERCOME THEM BY ACTION", category: "Dr Henry Link" },
+    { sentence: "WHAT YOU LACK IN TALENT CAN BE MADE UP WITH DESIRE HUSTLE AND GIVING EVERYTHING YOU GOT", category: "Don Zimmer" },
+    { sentence: "DO WHAT YOU CAN WITH ALL YOU HAVE WHEREVER YOU ARE", category: "Theodore Roosevelt" },
+    { sentence: "DEVELOP AN ATTITUDE OF GRATITUDE AND GIVE THANKS FOR EVERYTHING THAT HAPPENS TO YOU", category: "Brian Tracy" },
+    { sentence: "YOU ARE NEVER TOO OLD TO SET ANOTHER GOAL OR TO DREAM A NEW DREAM", category: "C S Lewis" },
+    { sentence: "TO SEE WHAT IS RIGHT AND NOT DO IT IS A LACK OF COURAGE", category: "Confucius" },
+    { sentence: "READING IS TO THE MIND AS EXERCISE IS TO THE BODY", category: "Brian Tracy" }
+  }
 };

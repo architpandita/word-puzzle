@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Home, XCircle } from 'lucide-react';
+import { RotateCcw, Home, XCircle } from 'lucide-react';
 
 export const GameOver = ({ correctAnswer, onRetry, onHome }) => {
   return (
@@ -20,7 +20,7 @@ export const GameOver = ({ correctAnswer, onRetry, onHome }) => {
             Level Failed!
           </h2>
           <p className="text-muted-foreground text-lg">
-            You've run out of lives, but don't worry - moving to next level!
+            You've run out of lives. Try this level again!
           </p>
         </div>
 
@@ -48,8 +48,8 @@ export const GameOver = ({ correctAnswer, onRetry, onHome }) => {
             onClick={onRetry}
             className="flex-1 font-game text-lg py-6 rounded-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-xl hover:scale-105 transition-all duration-300 gap-2"
           >
-            Next Level
-            <ArrowRight className="w-5 h-5" />
+            <RotateCcw className="w-5 h-5" />
+            Retry Level
           </Button>
         </div>
       </Card>

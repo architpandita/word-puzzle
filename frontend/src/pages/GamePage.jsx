@@ -16,8 +16,7 @@ import {
   getCompletedSentences, 
   addCompletedSentence, 
   saveGameState, 
-  getGameState,
-  clearGameState 
+  getGameState
 } from '@/utils/gameStorage';
 
 export const GamePage = () => {
@@ -140,7 +139,7 @@ export const GamePage = () => {
       );
       
       if (isComplete) {
-        // Mark sentence as completed
+        // Mark sentence as completed ONLY on success
         addCompletedSentence(currentSentence.sentence);
         
         setTimeout(() => {
@@ -162,10 +161,7 @@ export const GamePage = () => {
       });
 
       if (newLives === 0) {
-        // IMPORTANT: Mark sentence as completed even on failure
-        // This prevents the same sentence from appearing again
-        addCompletedSentence(currentSentence.sentence);
-        
+        // Do NOT mark as completed on failure
         setTimeout(() => {
           setShowGameOver(true);
         }, 1000);
@@ -209,7 +205,6 @@ export const GamePage = () => {
       setShowLevelComplete(false);
     } else {
       // All levels completed
-      clearGameState();
       toast.success('🎉 Congratulations!', {
         description: 'You completed all available levels!',
         duration: 3000,
@@ -221,16 +216,27 @@ export const GamePage = () => {
   };
 
   const handleRetry = () => {
-    // Move to next level instead of restarting
-    if (currentLevel < sentences.length - 1) {
-      setCurrentLevel(currentLevel + 1);
-      setLives(3);
-      setShowGameOver(false);
-    } else {
-      // No more levels, go home
-      clearGameState();
-      navigate('/');
-    }
+    // Retry the same level with fresh lives
+    setLives(3);
+    setShowGameOver(false);
+    
+    // Reset the current level
+    const words = currentSentence.sentence.split(' ');
+    const initialAnswer = words.map(word => {
+      const letters = word.split('').map((char, idx) => {
+        if (char === ' ') return { char: ' ', revealed: true, position: -1 };
+        const shouldReveal = Math.random() < 0.25 && idx < word.length;
+        return {
+          char: char.toUpperCase(),
+          revealed: shouldReveal,
+          position: -1
+        };
+      });
+      return letters;
+    });
+    setUserAnswer(initialAnswer);
+    setUsedLetters([]);
+    setHintUsed(false);
   };
 
   const handleHome = () => {
