@@ -1,0 +1,272 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import GameBoard from '@/components/game/GameBoard';
+import LetterKeyboard from '@/components/game/LetterKeyboard';
+import LivesDisplay from '@/components/game/LivesDisplay';
+import LevelComplete from '@/components/game/LevelComplete';
+import GameOver from '@/components/game/GameOver';
+import { gameData } from '@/data/gameData';
+import { Home, Lightbulb } from 'lucide-react';
+import { toast } from 'sonner';
+
+export const GamePage = () => {
+  const { category } = useParams();
+  const navigate = useNavigate();
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [userAnswer, setUserAnswer] = useState([]);
+  const [usedLetters, setUsedLetters] = useState([]);
+  const [showLevelComplete, setShowLevelComplete] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const sentences = gameData[category] || [];
+  const currentSentence = sentences[currentLevel];
+
+  // Initialize user answer when level changes
+  useEffect(() => {
+    if (currentSentence) {
+      const words = currentSentence.sentence.split(' ');
+      const initialAnswer = words.map(word => {
+        const letters = word.split('').map((char, idx) => {
+          if (char === ' ') return { char: ' ', revealed: true, position: -1 };
+          // Pre-fill 3-4 letters randomly
+          const shouldReveal = Math.random() < 0.25 && idx < word.length;
+          return {
+            char: char.toUpperCase(),
+            revealed: shouldReveal,
+            position: -1
+          };
+        });
+        return letters;
+      });
+      setUserAnswer(initialAnswer);
+      setUsedLetters([]);
+      setHintUsed(false);
+    }
+  }, [currentLevel, currentSentence]);
+
+  const handleLetterClick = (letter) => {
+    if (usedLetters.includes(letter)) return;
+
+    const correctAnswer = currentSentence.sentence.toUpperCase();
+    const isCorrect = correctAnswer.includes(letter);
+
+    if (isCorrect) {
+      // Update all positions where this letter appears
+      const updatedAnswer = userAnswer.map(word => 
+        word.map(letterObj => {
+          if (letterObj.char === letter && !letterObj.revealed) {
+            return { ...letterObj, revealed: true };
+          }
+          return letterObj;
+        })
+      );
+      setUserAnswer(updatedAnswer);
+      setUsedLetters([...usedLetters, letter]);
+      
+      toast.success('Correct!', {
+        description: `${letter} is in the sentence`,
+        duration: 2000,
+      });
+
+      // Check if puzzle is complete
+      const isComplete = updatedAnswer.every(word => 
+        word.every(letterObj => letterObj.revealed)
+      );
+      
+      if (isComplete) {
+        setTimeout(() => {
+          setShowLevelComplete(true);
+        }, 500);
+      }
+    } else {
+      const newLives = lives - 1;
+      setLives(newLives);
+      setUsedLetters([...usedLetters, letter]);
+      
+      // Shake animation
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      
+      toast.error('Wrong!', {
+        description: `${letter} is not in the sentence. Lives left: ${newLives}`,
+        duration: 2000,
+      });
+
+      if (newLives === 0) {
+        setTimeout(() => {
+          setShowGameOver(true);
+        }, 1000);
+      }
+    }
+  };
+
+  const handleHint = () => {
+    if (hintUsed) return;
+
+    // Find first unrevealed letter
+    let hintGiven = false;
+    const updatedAnswer = userAnswer.map(word => {
+      if (hintGiven) return word;
+      return word.map(letterObj => {
+        if (!letterObj.revealed && !hintGiven) {
+          hintGiven = true;
+          if (!usedLetters.includes(letterObj.char)) {
+            setUsedLetters([...usedLetters, letterObj.char]);
+          }
+          return { ...letterObj, revealed: true };
+        }
+        return letterObj;
+      });
+    });
+
+    if (hintGiven) {
+      setUserAnswer(updatedAnswer);
+      setHintUsed(true);
+      toast.info('Hint Used!', {
+        description: 'A letter has been revealed',
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleNextLevel = () => {
+    if (currentLevel < sentences.length - 1) {
+      setCurrentLevel(currentLevel + 1);
+      setShowLevelComplete(false);
+    } else {
+      toast.success('🎉 Congratulations!', {
+        description: 'You completed all levels!',
+        duration: 3000,
+      });
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+    }
+  };
+
+  const handleRetry = () => {
+    setLives(3);
+    setCurrentLevel(0);
+    setShowGameOver(false);
+  };
+
+  const handleHome = () => {
+    navigate('/');
+  };
+
+  if (!currentSentence) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground mb-4">Category not found</p>
+          <Button onClick={handleHome}>Go Home</Button>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1.5s' }} />
+
+      <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 animate-fade-in">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleHome}
+            className="gap-2 rounded-full"
+          >
+            <Home className="w-5 h-5" />
+            Home
+          </Button>
+          
+          <div className="text-center">
+            <h2 className="font-game text-2xl sm:text-3xl font-bold capitalize text-foreground">
+              {category}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Level {currentLevel + 1} of {sentences.length}
+            </p>
+          </div>
+
+          <LivesDisplay lives={lives} shake={shake} />
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8 animate-fade-in">
+          <Progress 
+            value={(currentLevel / sentences.length) * 100} 
+            className="h-3"
+          />
+        </div>
+
+        {/* Category Badge */}
+        <div className="flex justify-center mb-6 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 border-2 border-secondary/40">
+            <span className="text-sm font-medium text-secondary-foreground">
+              {currentSentence.category}
+            </span>
+          </div>
+        </div>
+
+        {/* Game Board */}
+        <Card className="mb-8 shadow-xl border-2 animate-fade-in">
+          <div className="p-6 sm:p-8">
+            <GameBoard userAnswer={userAnswer} shake={shake} />
+          </div>
+        </Card>
+
+        {/* Hint Button */}
+        <div className="flex justify-center mb-6 animate-fade-in">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleHint}
+            disabled={hintUsed}
+            className="gap-2 rounded-full bg-info/10 border-info/30 hover:bg-info/20 disabled:opacity-50"
+          >
+            <Lightbulb className="w-5 h-5" />
+            {hintUsed ? 'Hint Used' : 'Get Hint'}
+          </Button>
+        </div>
+
+        {/* Letter Keyboard */}
+        <div className="animate-fade-in">
+          <LetterKeyboard 
+            onLetterClick={handleLetterClick}
+            usedLetters={usedLetters}
+          />
+        </div>
+      </div>
+
+      {/* Modals */}
+      {showLevelComplete && (
+        <LevelComplete
+          level={currentLevel + 1}
+          onNext={handleNextLevel}
+          isLastLevel={currentLevel === sentences.length - 1}
+        />
+      )}
+
+      {showGameOver && (
+        <GameOver
+          correctAnswer={currentSentence.sentence}
+          onRetry={handleRetry}
+          onHome={handleHome}
+        />
+      )}
+    </div>
+  );
+};
+
+export default GamePage;
