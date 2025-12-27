@@ -104,5 +104,5 @@ export const gameData = {
     { sentence: "YOU ARE NEVER TOO OLD TO SET ANOTHER GOAL OR TO DREAM A NEW DREAM", category: "C S Lewis" },
     { sentence: "TO SEE WHAT IS RIGHT AND NOT DO IT IS A LACK OF COURAGE", category: "Confucius" },
     { sentence: "READING IS TO THE MIND AS EXERCISE IS TO THE BODY", category: "Brian Tracy" }
-  }
+  ]
 };
