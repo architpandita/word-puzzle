@@ -100,7 +100,7 @@ export const GamePage = () => {
 
   // Save game state whenever it changes
   useEffect(() => {
-    if (currentSentence && lives > 0) {
+    if (currentSentence && lives > 0 && !showLevelComplete && !showGameOver) {
       saveGameState({
         categories: category,
         currentLevel,
@@ -108,7 +108,7 @@ export const GamePage = () => {
         timestamp: Date.now()
       });
     }
-  }, [currentLevel, lives, category, currentSentence]);
+  }, [currentLevel, lives, category, currentSentence, showLevelComplete, showGameOver]);
 
   const handleLetterClick = (letter) => {
     if (usedLetters.includes(letter)) return;
@@ -162,6 +162,10 @@ export const GamePage = () => {
       });
 
       if (newLives === 0) {
+        // IMPORTANT: Mark sentence as completed even on failure
+        // This prevents the same sentence from appearing again
+        addCompletedSentence(currentSentence.sentence);
+        
         setTimeout(() => {
           setShowGameOver(true);
         }, 1000);
@@ -201,6 +205,7 @@ export const GamePage = () => {
   const handleNextLevel = () => {
     if (currentLevel < sentences.length - 1) {
       setCurrentLevel(currentLevel + 1);
+      setLives(3); // Reset lives for new level
       setShowLevelComplete(false);
     } else {
       // All levels completed
@@ -216,9 +221,16 @@ export const GamePage = () => {
   };
 
   const handleRetry = () => {
-    setLives(3);
-    setCurrentLevel(0);
-    setShowGameOver(false);
+    // Move to next level instead of restarting
+    if (currentLevel < sentences.length - 1) {
+      setCurrentLevel(currentLevel + 1);
+      setLives(3);
+      setShowGameOver(false);
+    } else {
+      // No more levels, go home
+      clearGameState();
+      navigate('/');
+    }
   };
 
   const handleHome = () => {
@@ -229,7 +241,7 @@ export const GamePage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30">
         <Card className="p-8 text-center space-y-4">
-          <h2 className="font-game text-2xl font-bold text-foreground">No More Sentences!</h2>
+          <h2 className="font-game text-2xl font-bold text-foreground">🎉 All Levels Complete!</h2>
           <p className="text-muted-foreground">You've completed all sentences in the selected categories.</p>
           <Button onClick={handleHome} className="font-game">Go Home</Button>
         </Card>
