@@ -8,9 +8,17 @@ import LetterKeyboard from '@/components/game/LetterKeyboard';
 import LivesDisplay from '@/components/game/LivesDisplay';
 import LevelComplete from '@/components/game/LevelComplete';
 import GameOver from '@/components/game/GameOver';
+import ThemeToggle from '@/components/ThemeToggle';
 import { gameData } from '@/data/gameData';
 import { Home, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
+import { 
+  getCompletedSentences, 
+  addCompletedSentence, 
+  saveGameState, 
+  getGameState,
+  clearGameState 
+} from '@/utils/gameStorage';
 
 export const GamePage = () => {
   const { category } = useParams();
@@ -23,8 +31,48 @@ export const GamePage = () => {
   const [showGameOver, setShowGameOver] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [shake, setShake] = useState(false);
+  const [sentences, setSentences] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const sentences = gameData[category] || [];
+  // Initialize game - load sentences and check for saved state
+  useEffect(() => {
+    const categoryIds = category.split(',');
+    setCategories(categoryIds);
+
+    // Gather all sentences from selected categories
+    let allSentences = [];
+    categoryIds.forEach(catId => {
+      if (gameData[catId]) {
+        allSentences = [...allSentences, ...gameData[catId]];
+      }
+    });
+
+    // Filter out completed sentences
+    const completedSentences = getCompletedSentences();
+    const availableSentences = allSentences.filter(
+      item => !completedSentences.includes(item.sentence)
+    );
+
+    // Shuffle sentences when multiple categories
+    if (categoryIds.length > 1) {
+      availableSentences.sort(() => Math.random() - 0.5);
+    }
+
+    setSentences(availableSentences);
+
+    // Check for saved game state
+    const savedState = getGameState();
+    if (savedState && savedState.categories === category) {
+      // Resume saved game
+      setCurrentLevel(savedState.currentLevel || 0);
+      setLives(savedState.lives || 3);
+      toast.info('Game Resumed', {
+        description: 'Continuing from where you left off',
+        duration: 2000,
+      });
+    }
+  }, [category]);
+
   const currentSentence = sentences[currentLevel];
 
   // Initialize user answer when level changes
@@ -34,7 +82,7 @@ export const GamePage = () => {
       const initialAnswer = words.map(word => {
         const letters = word.split('').map((char, idx) => {
           if (char === ' ') return { char: ' ', revealed: true, position: -1 };
-          // Pre-fill 3-4 letters randomly
+          // Pre-fill 3-4 letters randomly (25% chance)
           const shouldReveal = Math.random() < 0.25 && idx < word.length;
           return {
             char: char.toUpperCase(),
@@ -49,6 +97,18 @@ export const GamePage = () => {
       setHintUsed(false);
     }
   }, [currentLevel, currentSentence]);
+
+  // Save game state whenever it changes
+  useEffect(() => {
+    if (currentSentence && lives > 0) {
+      saveGameState({
+        categories: category,
+        currentLevel,
+        lives,
+        timestamp: Date.now()
+      });
+    }
+  }, [currentLevel, lives, category, currentSentence]);
 
   const handleLetterClick = (letter) => {
     if (usedLetters.includes(letter)) return;
@@ -80,6 +140,9 @@ export const GamePage = () => {
       );
       
       if (isComplete) {
+        // Mark sentence as completed
+        addCompletedSentence(currentSentence.sentence);
+        
         setTimeout(() => {
           setShowLevelComplete(true);
         }, 500);
@@ -140,8 +203,10 @@ export const GamePage = () => {
       setCurrentLevel(currentLevel + 1);
       setShowLevelComplete(false);
     } else {
+      // All levels completed
+      clearGameState();
       toast.success('🎉 Congratulations!', {
-        description: 'You completed all levels!',
+        description: 'You completed all available levels!',
         duration: 3000,
       });
       setTimeout(() => {
@@ -162,10 +227,11 @@ export const GamePage = () => {
 
   if (!currentSentence) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 text-center">
-          <p className="text-muted-foreground mb-4">Category not found</p>
-          <Button onClick={handleHome}>Go Home</Button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30">
+        <Card className="p-8 text-center space-y-4">
+          <h2 className="font-game text-2xl font-bold text-foreground">No More Sentences!</h2>
+          <p className="text-muted-foreground">You've completed all sentences in the selected categories.</p>
+          <Button onClick={handleHome} className="font-game">Go Home</Button>
         </Card>
       </div>
     );
@@ -173,6 +239,11 @@ export const GamePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative overflow-hidden">
+      {/* Theme Toggle - Top Right */}
+      <div className="fixed top-4 right-4 z-50 animate-fade-in">
+        <ThemeToggle />
+      </div>
+
       {/* Decorative elements */}
       <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-float" />
       <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1.5s' }} />
@@ -192,7 +263,7 @@ export const GamePage = () => {
           
           <div className="text-center">
             <h2 className="font-game text-2xl sm:text-3xl font-bold capitalize text-foreground">
-              {category}
+              {categories.length > 1 ? 'Mixed Categories' : category}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
               Level {currentLevel + 1} of {sentences.length}

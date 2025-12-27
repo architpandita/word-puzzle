@@ -1,12 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Lightbulb, Film, Heart, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import ThemeToggle from '@/components/ThemeToggle';
+import { Lightbulb, Film, Heart, Sparkles, RotateCcw } from 'lucide-react';
+import { getGameState, clearGameState, clearCompletedSentences } from '@/utils/gameStorage';
+import { toast } from 'sonner';
 
 export const CategorySelection = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [hasSavedGame, setHasSavedGame] = useState(false);
+
+  useEffect(() => {
+    // Check for saved game
+    const savedState = getGameState();
+    setHasSavedGame(!!savedState);
+  }, []);
 
   const categories = [
     {
@@ -35,14 +46,48 @@ export const CategorySelection = () => {
     }
   ];
 
+  const handleCategoryToggle = (categoryId) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
   const handleStartGame = () => {
-    if (selectedCategory) {
-      navigate(`/game/${selectedCategory}`);
+    if (selectedCategories.length > 0) {
+      // Clear any previous game state when starting fresh
+      clearGameState();
+      navigate(`/game/${selectedCategories.join(',')}`);
     }
+  };
+
+  const handleContinueGame = () => {
+    const savedState = getGameState();
+    if (savedState) {
+      navigate(`/game/${savedState.categories}`);
+    }
+  };
+
+  const handleResetProgress = () => {
+    clearGameState();
+    clearCompletedSentences();
+    setHasSavedGame(false);
+    toast.success('Progress Reset', {
+      description: 'All game progress has been cleared',
+      duration: 2000,
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Theme Toggle - Top Right */}
+      <div className="fixed top-4 right-4 z-50 animate-fade-in">
+        <ThemeToggle />
+      </div>
+
       {/* Decorative floating elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-float" />
       <div className="absolute bottom-20 right-10 w-32 h-32 bg-secondary/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }} />
@@ -59,15 +104,37 @@ export const CategorySelection = () => {
             <Sparkles className="w-8 h-8 text-accent animate-pulse-gentle" />
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Choose your category and test your knowledge! Can you complete the sentences with only 3 lives?
+            Choose one or more categories! Mix them up for a shuffled challenge.
           </p>
         </div>
+
+        {/* Continue/Reset buttons */}
+        {hasSavedGame && (
+          <div className="flex justify-center gap-3">
+            <Button
+              size="lg"
+              onClick={handleContinueGame}
+              className="font-game rounded-full bg-gradient-to-r from-success to-primary hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              Continue Game
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleResetProgress}
+              className="font-game rounded-full gap-2"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset Progress
+            </Button>
+          </div>
+        )}
 
         {/* Category Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((category, index) => {
             const Icon = category.icon;
-            const isSelected = selectedCategory === category.id;
+            const isSelected = selectedCategories.includes(category.id);
             
             return (
               <Card
@@ -77,7 +144,7 @@ export const CategorySelection = () => {
                     ? 'border-primary shadow-xl scale-105 ring-4 ring-primary/20' 
                     : 'border-border hover:border-primary/50'
                 }`}
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => handleCategoryToggle(category.id)}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="relative p-6 space-y-4">
@@ -113,15 +180,24 @@ export const CategorySelection = () => {
           })}
         </div>
 
+        {/* Selected categories count */}
+        {selectedCategories.length > 0 && (
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="text-base px-4 py-2">
+              {selectedCategories.length} {selectedCategories.length === 1 ? 'category' : 'categories'} selected
+            </Badge>
+          </div>
+        )}
+
         {/* Start Button */}
         <div className="flex justify-center pt-4">
           <Button
             size="lg"
             onClick={handleStartGame}
-            disabled={!selectedCategory}
+            disabled={selectedCategories.length === 0}
             className="font-game text-xl px-12 py-6 rounded-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
           >
-            Start Playing
+            Start New Game
           </Button>
         </div>
 
@@ -135,7 +211,7 @@ export const CategorySelection = () => {
                   1
                 </div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <span className="font-medium text-foreground">Fill in the blanks</span> by clicking on the available letters
+                  <span className="font-medium text-foreground">Select categories</span> - Choose one or multiple for variety
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -143,7 +219,7 @@ export const CategorySelection = () => {
                   2
                 </div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <span className="font-medium text-foreground">You have 3 lives</span> - lose them all and it's game over!
+                  <span className="font-medium text-foreground">3 lives only</span> - Progress is saved automatically!
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -151,7 +227,7 @@ export const CategorySelection = () => {
                   3
                 </div>
                 <p className="text-muted-foreground leading-relaxed">
-                  <span className="font-medium text-foreground">Use hints</span> if you get stuck, but use them wisely!
+                  <span className="font-medium text-foreground">Works offline</span> - Install as PWA for offline play
                 </p>
               </div>
             </div>
