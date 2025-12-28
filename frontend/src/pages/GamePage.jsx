@@ -361,7 +361,7 @@ export const GamePage = () => {
       </div>
 
       {/* Fixed Letter Keyboard at Bottom - ALWAYS VISIBLE */}
-      <div className="flex-shrink-0 bg-background border-t-2 border-border shadow-2xl">
+      <div className="flex-none bg-background border-t-2 border-border shadow-2xl">
         <div className="px-2 py-3">
           <LetterKeyboard 
             onLetterClick={handleLetterClick}
