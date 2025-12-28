@@ -110,13 +110,18 @@ export const GamePage = () => {
 
   // Handle box click - select the box
   const handleBoxClick = (wordIdx, letterIdx) => {
+    console.log('handleBoxClick called:', { wordIdx, letterIdx });
+    
     // Only allow selecting unrevealed boxes
     if (!userAnswer[wordIdx][letterIdx].revealed) {
       setSelectedPosition({ wordIdx, letterIdx });
+      console.log('Box selected:', { wordIdx, letterIdx, char: userAnswer[wordIdx][letterIdx].char });
       toast.info('Box Selected', {
         description: 'Now click a letter to fill this box',
         duration: 1500,
       });
+    } else {
+      console.log('Box already revealed, ignoring click');
     }
   };
 
