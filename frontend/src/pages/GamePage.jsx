@@ -25,14 +25,13 @@ export const GamePage = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [lives, setLives] = useState(3);
   const [userAnswer, setUserAnswer] = useState([]);
-  const [usedLetters, setUsedLetters] = useState([]);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [shake, setShake] = useState(false);
   const [sentences, setSentences] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [activePosition, setActivePosition] = useState(null); // Track active letter position
+  const [selectedPosition, setSelectedPosition] = useState(null); // Track selected box
 
   // Initialize game - load sentences and check for saved state
   useEffect(() => {
@@ -80,39 +79,22 @@ export const GamePage = () => {
     if (currentSentence) {
       const words = currentSentence.sentence.split(' ');
       const initialAnswer = words.map(word => {
-        const letters = word.split('').map((char, idx) => {
-          if (char === ' ') return { char: ' ', revealed: true, position: -1 };
+        const letters = word.split('').map((char) => {
+          if (char === ' ') return { char: ' ', revealed: true };
           // Pre-fill 3-4 letters randomly (25% chance)
-          const shouldReveal = Math.random() < 0.25 && idx < word.length;
+          const shouldReveal = Math.random() < 0.25;
           return {
             char: char.toUpperCase(),
-            revealed: shouldReveal,
-            position: -1
+            revealed: shouldReveal
           };
         });
         return letters;
       });
       setUserAnswer(initialAnswer);
-      setUsedLetters([]);
       setHintUsed(false);
-      
-      // Set first unrevealed position as active
-      findAndSetNextActivePosition(initialAnswer);
+      setSelectedPosition(null);
     }
   }, [currentLevel, currentSentence]);
-
-  // Find next unrevealed position and set it as active
-  const findAndSetNextActivePosition = (answer) => {
-    for (let wordIdx = 0; wordIdx < answer.length; wordIdx++) {
-      for (let letterIdx = 0; letterIdx < answer[wordIdx].length; letterIdx++) {
-        if (!answer[wordIdx][letterIdx].revealed) {
-          setActivePosition({ wordIdx, letterIdx });
-          return;
-        }
-      }
-    }
-    setActivePosition(null); // All revealed
-  };
 
   // Save game state whenever it changes
   useEffect(() => {
@@ -126,30 +108,46 @@ export const GamePage = () => {
     }
   }, [currentLevel, lives, category, currentSentence, showLevelComplete, showGameOver]);
 
+  // Handle box click - select the box
+  const handleBoxClick = (wordIdx, letterIdx) => {
+    // Only allow selecting unrevealed boxes
+    if (!userAnswer[wordIdx][letterIdx].revealed) {
+      setSelectedPosition({ wordIdx, letterIdx });
+      toast.info('Box Selected', {
+        description: 'Now click a letter to fill this box',
+        duration: 1500,
+      });
+    }
+  };
+
+  // Handle letter click - fill in selected box
   const handleLetterClick = (letter) => {
-    if (usedLetters.includes(letter)) return;
+    if (!selectedPosition) {
+      toast.error('No Box Selected', {
+        description: 'Please click on an empty box first',
+        duration: 2000,
+      });
+      return;
+    }
 
-    const correctAnswer = currentSentence.sentence.toUpperCase();
-    const isCorrect = correctAnswer.includes(letter);
+    const { wordIdx, letterIdx } = selectedPosition;
+    const correctLetter = userAnswer[wordIdx][letterIdx].char;
 
-    if (isCorrect) {
-      // Update all positions where this letter appears
-      const updatedAnswer = userAnswer.map(word => 
-        word.map(letterObj => {
-          if (letterObj.char === letter && !letterObj.revealed) {
+    if (letter === correctLetter) {
+      // Correct letter!
+      const updatedAnswer = userAnswer.map((word, wIdx) => 
+        word.map((letterObj, lIdx) => {
+          if (wIdx === wordIdx && lIdx === letterIdx) {
             return { ...letterObj, revealed: true };
           }
           return letterObj;
         })
       );
       setUserAnswer(updatedAnswer);
-      setUsedLetters([...usedLetters, letter]);
-      
-      // Update active position
-      findAndSetNextActivePosition(updatedAnswer);
+      setSelectedPosition(null);
       
       toast.success('Correct!', {
-        description: `${letter} is in the sentence`,
+        description: `${letter} is the right letter for this position`,
         duration: 1500,
       });
 
@@ -159,30 +157,27 @@ export const GamePage = () => {
       );
       
       if (isComplete) {
-        // Mark sentence as completed ONLY on success
         addCompletedSentence(currentSentence.sentence);
-        setActivePosition(null);
-        
         setTimeout(() => {
           setShowLevelComplete(true);
         }, 500);
       }
     } else {
+      // Wrong letter!
       const newLives = lives - 1;
       setLives(newLives);
-      setUsedLetters([...usedLetters, letter]);
+      setSelectedPosition(null);
       
       // Shake animation
       setShake(true);
       setTimeout(() => setShake(false), 500);
       
-      toast.error('Wrong!', {
-        description: `${letter} is not in the sentence. Lives left: ${newLives}`,
-        duration: 1500,
+      toast.error('Wrong Letter!', {
+        description: `${letter} is not correct for this position. Lives left: ${newLives}`,
+        duration: 2000,
       });
 
       if (newLives === 0) {
-        // Do NOT mark as completed on failure
         setTimeout(() => {
           setShowGameOver(true);
         }, 1000);
@@ -193,16 +188,13 @@ export const GamePage = () => {
   const handleHint = () => {
     if (hintUsed) return;
 
-    // Find first unrevealed letter
+    // Find first unrevealed letter and reveal it
     let hintGiven = false;
     const updatedAnswer = userAnswer.map(word => {
       if (hintGiven) return word;
       return word.map(letterObj => {
         if (!letterObj.revealed && !hintGiven) {
           hintGiven = true;
-          if (!usedLetters.includes(letterObj.char)) {
-            setUsedLetters([...usedLetters, letterObj.char]);
-          }
           return { ...letterObj, revealed: true };
         }
         return letterObj;
@@ -212,7 +204,7 @@ export const GamePage = () => {
     if (hintGiven) {
       setUserAnswer(updatedAnswer);
       setHintUsed(true);
-      findAndSetNextActivePosition(updatedAnswer);
+      setSelectedPosition(null);
       toast.info('Hint Used!', {
         description: 'A letter has been revealed',
         duration: 2000,
@@ -223,10 +215,9 @@ export const GamePage = () => {
   const handleNextLevel = () => {
     if (currentLevel < sentences.length - 1) {
       setCurrentLevel(currentLevel + 1);
-      setLives(3); // Reset lives for new level
+      setLives(3);
       setShowLevelComplete(false);
     } else {
-      // All levels completed
       toast.success('🎉 Congratulations!', {
         description: 'You completed all available levels!',
         duration: 3000,
@@ -238,28 +229,24 @@ export const GamePage = () => {
   };
 
   const handleRetry = () => {
-    // Retry the same level with fresh lives
     setLives(3);
     setShowGameOver(false);
     
-    // Reset the current level
     const words = currentSentence.sentence.split(' ');
     const initialAnswer = words.map(word => {
-      const letters = word.split('').map((char, idx) => {
-        if (char === ' ') return { char: ' ', revealed: true, position: -1 };
-        const shouldReveal = Math.random() < 0.25 && idx < word.length;
+      const letters = word.split('').map((char) => {
+        if (char === ' ') return { char: ' ', revealed: true };
+        const shouldReveal = Math.random() < 0.25;
         return {
           char: char.toUpperCase(),
-          revealed: shouldReveal,
-          position: -1
+          revealed: shouldReveal
         };
       });
       return letters;
     });
     setUserAnswer(initialAnswer);
-    setUsedLetters([]);
     setHintUsed(false);
-    findAndSetNextActivePosition(initialAnswer);
+    setSelectedPosition(null);
   };
 
   const handleHome = () => {
@@ -285,8 +272,8 @@ export const GamePage = () => {
         <ThemeToggle />
       </div>
 
-      {/* Compact Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-border/50">
+      {/* Compact Header - Fixed */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-border/50 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -310,7 +297,6 @@ export const GamePage = () => {
           <LivesDisplay lives={lives} shake={shake} />
         </div>
 
-        {/* Compact Progress Bar */}
         <div className="mt-2">
           <Progress 
             value={(currentLevel / sentences.length) * 100} 
@@ -319,7 +305,7 @@ export const GamePage = () => {
         </div>
       </div>
 
-      {/* Scrollable Content Area */}
+      {/* Scrollable Content Area - ONLY THIS SCROLLS */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="max-w-4xl mx-auto space-y-4">
           {/* Category Badge */}
@@ -331,13 +317,26 @@ export const GamePage = () => {
             </div>
           </div>
 
+          {/* Instruction */}
+          {!selectedPosition && (
+            <div className="text-center text-sm text-muted-foreground animate-pulse">
+              👆 Click an empty box first, then click a letter
+            </div>
+          )}
+          {selectedPosition && (
+            <div className="text-center text-sm text-warning font-semibold animate-pulse">
+              ✨ Box selected! Now click the correct letter
+            </div>
+          )}
+
           {/* Game Board */}
           <Card className="shadow-lg border-2">
             <div className="p-4 sm:p-6">
               <GameBoard 
                 userAnswer={userAnswer} 
                 shake={shake}
-                activePosition={activePosition}
+                selectedPosition={selectedPosition}
+                onBoxClick={handleBoxClick}
               />
             </div>
           </Card>
@@ -356,17 +355,17 @@ export const GamePage = () => {
             </Button>
           </div>
 
-          {/* Extra spacing for scrolling comfort */}
-          <div className="h-8" />
+          {/* Extra spacing for comfortable scrolling */}
+          <div className="h-32" />
         </div>
       </div>
 
-      {/* Fixed Letter Keyboard at Bottom */}
-      <div className="flex-shrink-0 bg-background/95 backdrop-blur-sm border-t-2 border-border/50 shadow-lg">
+      {/* Fixed Letter Keyboard at Bottom - ALWAYS VISIBLE */}
+      <div className="flex-shrink-0 bg-background border-t-2 border-border shadow-2xl">
         <div className="px-2 py-3">
           <LetterKeyboard 
             onLetterClick={handleLetterClick}
-            usedLetters={usedLetters}
+            selectedPosition={selectedPosition}
           />
         </div>
       </div>
