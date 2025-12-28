@@ -21,6 +21,13 @@ export const GameBoard = ({ userAnswer, shake, selectedPosition, onBoxClick }) =
 
   const letterPositions = getLetterPositions();
 
+  const handleBoxClick = (wordIdx, letterIdx, letterObj) => {
+    if (!letterObj.revealed) {
+      console.log('Box clicked:', { wordIdx, letterIdx, char: letterObj.char });
+      onBoxClick(wordIdx, letterIdx);
+    }
+  };
+
   return (
     <div className={`space-y-4 ${shake ? 'animate-shake' : ''}`}>
       {userAnswer.map((word, wordIndex) => (
@@ -37,9 +44,9 @@ export const GameBoard = ({ userAnswer, shake, selectedPosition, onBoxClick }) =
                 className="relative"
               >
                 {/* Letter tile - CLICKABLE */}
-                <Card
-                  onClick={() => !letterObj.revealed && onBoxClick(wordIndex, letterIndex)}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center border-2 transition-all duration-300 ${
+                <div
+                  onClick={() => handleBoxClick(wordIndex, letterIndex, letterObj)}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center border-2 rounded-lg transition-all duration-300 ${
                     isSelected
                       ? 'bg-warning/30 border-warning shadow-xl scale-110 ring-4 ring-warning/50 cursor-pointer'
                       : letterObj.revealed
@@ -47,12 +54,12 @@ export const GameBoard = ({ userAnswer, shake, selectedPosition, onBoxClick }) =
                       : 'bg-muted/30 border-border/50 hover:border-warning/50 hover:scale-105 cursor-pointer hover:shadow-md'
                   }`}
                 >
-                  <span className={`font-game text-xl sm:text-2xl md:text-3xl font-bold transition-colors ${
+                  <span className={`font-game text-xl sm:text-2xl md:text-3xl font-bold transition-colors select-none ${
                     letterObj.revealed ? 'text-primary' : 'text-transparent'
                   }`}>
                     {letterObj.char}
                   </span>
-                </Card>
+                </div>
                 
                 {/* Position number badge */}
                 <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-all duration-300 ${
