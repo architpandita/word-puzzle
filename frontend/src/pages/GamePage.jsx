@@ -266,14 +266,14 @@ export const GamePage = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/30 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-background via-background to-muted/30">
       {/* Theme Toggle - Top Right */}
-      <div className="fixed top-2 right-2 z-50">
+      <div className="absolute top-2 right-2 z-50">
         <ThemeToggle />
       </div>
 
       {/* Compact Header - Fixed */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-border/50 bg-background/95 backdrop-blur-sm">
+      <div className="flex-none px-4 py-3 border-b border-border/50 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -306,7 +306,7 @@ export const GamePage = () => {
       </div>
 
       {/* Scrollable Content Area - ONLY THIS SCROLLS */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
         <div className="max-w-4xl mx-auto space-y-4">
           {/* Category Badge */}
           <div className="flex justify-center">
