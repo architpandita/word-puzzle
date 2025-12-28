@@ -62,7 +62,7 @@ export const GameBoard = ({ userAnswer, shake, selectedPosition, onBoxClick }) =
                 </div>
                 
                 {/* Position number badge */}
-                <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-all duration-300 ${
+                <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-all duration-300 pointer-events-none ${
                   isSelected
                     ? 'bg-warning text-warning-foreground scale-110 ring-2 ring-warning'
                     : letterObj.revealed
@@ -75,21 +75,13 @@ export const GameBoard = ({ userAnswer, shake, selectedPosition, onBoxClick }) =
                 {/* Selected indicator - pointing arrow and glow */}
                 {isSelected && (
                   <>
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce pointer-events-none">
                       <div className="flex flex-col items-center">
                         <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-warning" />
                         <span className="text-xs font-bold text-warning mt-1">HERE</span>
                       </div>
                     </div>
-                    <div className="absolute inset-0 bg-warning/20 rounded-lg animate-pulse" />
                   </>
-                )}
-
-                {/* Click hint for empty boxes */}
-                {!letterObj.revealed && !isSelected && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-xs text-muted-foreground font-semibold">CLICK</span>
-                  </div>
                 )}
               </div>
             );
