@@ -133,16 +133,26 @@ export const GamePage = () => {
     const { wordIdx, letterIdx } = selectedPosition;
     const correctLetter = userAnswer[wordIdx][letterIdx].char;
 
+    console.log('=== LETTER CLICK DEBUG ===');
+    console.log('Selected position:', { wordIdx, letterIdx });
+    console.log('Clicked letter:', letter);
+    console.log('Correct letter at position:', correctLetter);
+
     if (letter === correctLetter) {
       // Correct letter!
+      console.log('✓ Letter is CORRECT');
+      
       const updatedAnswer = userAnswer.map((word, wIdx) => 
         word.map((letterObj, lIdx) => {
-          if (wIdx === wordIdx && lIdx === letterIdx) {
-            return { ...letterObj, revealed: true };
+          const shouldReveal = wIdx === wordIdx && lIdx === letterIdx;
+          if (shouldReveal) {
+            console.log(`  Revealing: word[${wIdx}][${lIdx}] = ${letterObj.char}`);
           }
-          return letterObj;
+          return shouldReveal ? { ...letterObj, revealed: true } : letterObj;
         })
       );
+      
+      console.log('Updated answer:', updatedAnswer);
       setUserAnswer(updatedAnswer);
       setSelectedPosition(null);
       
