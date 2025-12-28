@@ -262,6 +262,20 @@ test_plan:
   test_all: true
   test_priority: "completed"
 
+  - task: "Manual Box Selection Mechanics"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/GamePage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Manual box selection mechanics working perfectly. Verified: 1) Keyboard disabled initially with 'Select a box above first' message, 2) Box selection shows yellow highlight, scale-110 effect, ring glow, and 'HERE' arrow indicator, 3) Instruction changes to 'Box selected! Now click the correct letter', 4) Keyboard enables after box selection, 5) Wrong letters reduce lives and clear selection, 6) Correct letters reveal ONLY in selected box (no auto-fill), 7) Fixed keyboard layout maintained on mobile (390x844) and desktop (1920x1080), 8) Content area scrollable independently. CRITICAL: No auto-fill behavior confirmed - letters only fill in manually selected boxes."
+
 agent_communication:
     - agent: "testing"
       message: "Comprehensive testing completed for Complete the Sentence game. All major functionality is working correctly. The game provides excellent user experience with proper visual feedback, responsive design, and smooth gameplay mechanics. Only minor issue is that Level Complete modal testing was not fully completed due to complexity of finishing entire sentences, but the component exists and appears functional."
+    - agent: "testing"
+      message: "Manual box selection mechanics tested and verified working correctly. Key findings: 1) Box selection requires JavaScript click due to hover overlay interception, 2) All visual feedback works (yellow highlight, scale, arrow), 3) Keyboard state management perfect, 4) No auto-fill behavior - letters only fill selected box, 5) Fixed keyboard layout on all viewports, 6) Proper error/success feedback. The manual selection flow prevents auto-filling across multiple positions as required."
